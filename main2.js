@@ -1,19 +1,25 @@
-const sites = [] //The locations of the sites
+//const sites = [] //The locations of the sites
+const sites = [100,100,200,100,300,100,400,100,100,200,200,200,300,200,400,200,100,300,200,300,300,300,400,300]
 const beachLine = [-1,-1] //List of the sites that make up the beach line from left to right
 let xBounds = [] //The x bounds of each site on the beach line
 
 const size = 500  //The width and height of the screen
 const space = 100 //The radius around each site where new sites are not allowed
+let hStep = 0.5 //The change in height each frame
 let height = 0 //The current height of the sweep line
-let hStep = 1 //The change in height each frame
+
 
 let points = [] //An array of points equidistant from two or more sites
 let run = true //For starting and stopping the animation
 
 function setup(){
   createCanvas(size, size)
-  createSites() //Create random sites with atleast "space" space around each one
+  //createSites() //Create random sites with atleast "space" space around each one
   frameRate(30)
+
+  for(let i = 0; i<=sites.length-2; i+=2){
+    console.log(sites[i],sites[i+1])
+  }
 
 }
 
@@ -78,13 +84,13 @@ function draw(){
 */
 function findIntersection(x1,y1,x2,y2){
   //calculate the coeficients for the two equidistant paraboli. (y = a*x^2 + b*x + c)
-  let a1 = -1 / (2 * (height - y1))
-  let b1 = x1 / (height - y1)
-  let c1 = -(x1 * x1) / (2 * (height - y1)) + (height + y1) / 2
+  let a1 = -1 / (2 * (height+.001 - y1))
+  let b1 = x1 / (height+.001  - y1)
+  let c1 = -(x1 * x1) / (2 * (height+.001  - y1)) + (height+.001  + y1) / 2
 
-  let a2 = -1 / (2 * (height - y2))
-  let b2 = x2 / (height - y2)
-  let c2 = -(x2 * x2) / (2 * (height - y2)) + (height + y2) / 2
+  let a2 = -1 / (2 * (height+.001  - y2))
+  let b2 = x2 / (height+.001  - y2)
+  let c2 = -(x2 * x2) / (2 * (height+.001  - y2)) + (height+.001  + y2) / 2
 
   let a = 0
   let b = 0
@@ -140,6 +146,45 @@ function findIntersection(x1,y1,x2,y2){
 
 }
 
+function calcBounds(){
+  xBounds = [0]
+
+  for(let i = 0; i<=beachLine.length-4; i+=2){
+    let point = findIntersection(beachLine[i], beachLine[i+1], beachLine[i+2], beachLine[i+3])
+    points.push(point[0],point[1])
+    xBounds.splice(i+1, 0, point[0])
+  }
+  xBounds.splice(xBounds.length, 0, size)
+}
+
+function add(newx, newy){
+  let index = 0
+  while(xBounds[index]<newx){
+    index++
+  }
+  index = (index-1)*2
+  beachLine.splice(index,0,beachLine[index],beachLine[index+1],newx,newy)
+
+  /*calcBounds()
+  console.log("beach line")
+  for(let i = 0; i<=beachLine.length-2; i+=2){
+    console.log(beachLine[i],beachLine[i+1])
+  }
+
+  console.log("x bounds")
+  for(let i = 0; i<xBounds.length; i++){
+    console.log(xBounds[i])
+  }*/
+}
+
+function rem(){
+  for(let i = 0; i<xBounds.length-1; i++){
+    if(xBounds[i+1]<xBounds[i]){
+      beachLine.splice(i*2,2)
+    }
+  }
+}
+
 function drawParabola(px,py,startx,endx){
   let a = -1 / (2 * (height - py))
   let b = px / (height - py)
@@ -160,17 +205,6 @@ function drawParabola(px,py,startx,endx){
     x2 = x1 + x_step
     y2 = y2 = a*x2*x2 + b*x2 + c
   }
-}
-
-function calcBounds(){
-  xBounds = [0]
-
-  for(let i = 0; i<=beachLine.length-4; i+=2){
-    let point = findIntersection(beachLine[i], beachLine[i+1], beachLine[i+2], beachLine[i+3])
-    points.push(point[0],point[1])
-    xBounds.splice(i+1, 0, point[0])
-  }
-  xBounds.splice(xBounds.length, 0, size)
 }
 
 function createSites(){
@@ -199,23 +233,6 @@ function createSites(){
         sites.push(x)
         sites.push(y)
       }
-    }
-  }
-}
-
-function add(newx, newy){
-  let index = 0
-  while(xBounds[index]<newx){
-    index++
-  }
-  index = (index-1)*2
-  beachLine.splice(index,0,beachLine[index],beachLine[index+1],newx,newy)
-}
-
-function rem(){
-  for(let i = 0; i<xBounds.length-1; i++){
-    if(xBounds[i+1]<xBounds[i]){
-      beachLine.splice(i*2,2)
     }
   }
 }
