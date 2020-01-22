@@ -1,5 +1,5 @@
 //const sites = [] //The locations of the sites
-const sites = [100,100,200,100,300,100,400,100,100,200,200,200,300,200,400,200,100,300,200,300,300,300,400,300]
+const sites = [100,100,200,100,300,100,400,100,100,200,200,200,300,200,400,200,100,300,200,300,300,300,400,300,100,400,200,400,300,400,400,400]
 const beachLine = [-1,-1] //List of the sites that make up the beach line from left to right
 let xBounds = [] //The x bounds of each site on the beach line
 
@@ -17,9 +17,9 @@ function setup(){
   //createSites() //Create random sites with atleast "space" space around each one
   frameRate(30)
 
-  for(let i = 0; i<=sites.length-2; i+=2){
+  /*for(let i = 0; i<=sites.length-2; i+=2){
     console.log(sites[i],sites[i+1])
-  }
+  }*/
 
 }
 
@@ -178,9 +178,13 @@ function add(newx, newy){
 }
 
 function rem(){
+  let index = 0
   for(let i = 0; i<xBounds.length-1; i++){
     if(xBounds[i+1]<xBounds[i]){
-      beachLine.splice(i*2,2)
+      beachLine.splice(index*2,2)
+    }
+    else{
+      index++
     }
   }
 }
